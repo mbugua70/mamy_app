@@ -240,6 +240,9 @@ function TokenHolder() {
 }
 
 export default function App() {
+
+
+
   return (
     <>
       <StatusBar style='dark' />

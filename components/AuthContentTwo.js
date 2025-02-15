@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SummaryForm } from "../http/api";
 // import { Colors } from '../../constants/styles';
 
+import { Toast as ToastTwo } from "react-native-toast-message";
 import Toast from "react-native-toast-message";
 import FormContainerTwo from "./FormContainerTwo";
 
@@ -34,6 +35,22 @@ function AuthContentTwo({
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsOffline(!state.isConnected);
       setIsInternetReachable(state.isInternetReachable);
+
+      if(!state.isConnected){
+        Toast.show({
+          type: "error",
+          text1: "Network Error",
+          text2: "No internet connection. Please try again later.",
+        });
+      }
+
+      if(!state.isInternetReachable){
+        Toast.show({
+          type: "error",
+          text1: "Network Error",
+          text2: "No internet access",
+        });
+      }
     });
 
     setTimeout(() => {
