@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable, KeyboardAvoidingView,TouchableWithoutFeedback, ScrollView, Keyboard} from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import React, {useState, useLayoutEffect} from 'react';
-
+import { ActivityIndicator, MD2Colors } from "react-native-paper";
 import Input from "./Input";
 import FlatButton from "../UI/FlatButton";
 import { GlobalStyles } from '../Constants/Globalcolors';
@@ -93,7 +93,12 @@ const FormContainer = ({ onSubmit, credentialsInvalid, isAuthenticate, name, pho
 
        {/* button content */}
         <View style={styles.submitContainer}>
-         {!isUpdating &&  <FlatButton onPress={submitHandler}>
+         {isAuthenticate && <ActivityIndicator
+                animating={true}
+                color={MD2Colors.lightBlueA700}
+                size='small'
+              />}
+         {(!isUpdating &&  !isAuthenticate) && <FlatButton onPress={submitHandler}>
             Login
          </FlatButton>}
         </View>
