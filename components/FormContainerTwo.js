@@ -328,7 +328,8 @@ const FormContainerTwo = ({
               )}
               value={enteredCorporateName}
               placeholder='Enter corporate name to search'
-                isInvalid={corporatenameIsValid}
+              isInvalid={corporatenameIsValid}
+              inputType="search"
             />
           )}
 
@@ -370,6 +371,7 @@ const FormContainerTwo = ({
               )}
               value={enteredAppointDate}
               placeholder='YYYY-MM-DD'
+
             />
           )}
 

@@ -15,6 +15,7 @@ const InputTwo = forwardRef(
       onSubmitEditing,
       blurOnSubmit,
       returnKeyType,
+      inputType
     },
     ref
   ) => {
@@ -28,6 +29,7 @@ const InputTwo = forwardRef(
           <TextInput
             style={[styles.input, isInvalid && styles.inputInvalid]}
             // autoCapitalize={false}
+            inputMode={inputType}
             autoCapitalize='none'
             keyboardType={keyboardType}
             secureTextEntry={secure}
