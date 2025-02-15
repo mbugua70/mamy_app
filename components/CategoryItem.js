@@ -4,6 +4,7 @@ import {
     Pressable,
     StyleSheet,
     Platform,
+    Image,
   } from "react-native";
 
   const CategoryItem = ({ onNavigate, title, color}) => {
@@ -18,6 +19,10 @@ import {
           onPress={onNavigate}
         >
           <View style={[styles.innerGridContainer, {backgroundColor: color}]}>
+            <View style={styles.imageContainer}>
+               {/* icon */}
+               <Image source={require("../assets/image/sunglases.png")}  style={styles.image}/>
+            </View>
             <Text style={styles.title}>{title}</Text>
           </View>
         </Pressable>
@@ -54,13 +59,27 @@ import {
       height: "100%",
       padding: 16,
       borderRadius: 8,
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: "space-between",
+      // alignItems: "center",
     },
 
     title: {
       fontWeight: "bold",
-      fontSize: 18,
-      color: "#fff",
+      fontSize: 16,
+      color: "#f3f1f0",
     },
+
+    imageContainer: {
+      alignItems: "flex-start",
+      backgroundColor: "#f3f1f0",
+      borderRadius: 16,
+      width: 32,
+      height: 32,
+      padding: 4,
+    },
+
+    image: {
+      width: "100%",
+      height: "100%",
+    }
   });
