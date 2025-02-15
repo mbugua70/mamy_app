@@ -38,7 +38,7 @@ const Report = () => {
 
     async function submitHandler(credentials){
       const { sales, location, corporate, staff, person, insurance } = credentials;
-       console.log(sales, location, corporate, staff, person, insurance, "received data")
+
       mutate(credentials)
       }
 

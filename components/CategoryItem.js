@@ -29,11 +29,10 @@ import {
 
   const styles = StyleSheet.create({
     gridNavItem: {
-      // flex: 1,
-      marginTop: 10,
-      marginHorizontal: 18,
+      marginTop: 18,
+      width: "48%",
       height: 150,
-      borderRadius: 8,
+      borderRadius: 16,
       elevation: 8,
       shadowRadius: 8,
       shadowColor: "#fff",

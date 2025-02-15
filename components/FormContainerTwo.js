@@ -6,15 +6,20 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  FlatList,
+  TouchableOpacity,
 } from "react-native";
 import { ActivityIndicator, MD2Colors } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { fetchRecordDataSearch } from "../http/api";
 
 import InputTwo from "./InputTwo";
 import FlatButton from "../UI/FlatButton";
 import DropdownComponent from "./Dropdown";
 import LocationPicker from "./LocationPicker";
+import SearchComp from "./SearchComp";
 
 const data = {
   locationData: [
@@ -54,8 +59,16 @@ const FormContainerTwo = ({
   isEyeClinicScreen,
   isOutComeScreen,
 }) => {
-  const [enteredSales, setEnteredSales] = useState("");
+  const dataFetched = [
+    "Apple",
+    "Banana",
+    "Cherry",
+    "Mango",
+    "Grapes",
+    "Pineapple",
+  ];
   const [enteredCorporate, setEnteredCorporate] = useState("");
+  const [enteredSales, setEnteredSales] = useState("");
   const [enteredPerson, setEnteredPerson] = useState("");
   const [enteredStaff, setEnteredStaff] = useState("");
   const [enteredFirms, setEnteredFirms] = useState("");
@@ -65,9 +78,13 @@ const FormContainerTwo = ({
   const [enteredDesignation, setEnteredDesignation] = useState("");
   const [enteredDate, setEnteredDate] = useState("");
   const [enteredTime, setEnteredTime] = useState("");
-  const [enteredNoStaffTalk, setEnteredNoStaffTalk] = useState("")
-  const [enteredCoupons, setEnteredCoupons] = useState("")
-  const [enteredFeedback, setEnteredFeedback] = useState("")
+  const [enteredNoStaffTalk, setEnteredNoStaffTalk] = useState("");
+  const [enteredCoupons, setEnteredCoupons] = useState("");
+  const [enteredFeedback, setEnteredFeedback] = useState("");
+  const [enteredCorporateName, setEnteredCorporateName] = useState("");
+  const [query, setQuery] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const [selected, setSelected] = useState("");
 
   const navigaton = useNavigation();
 
@@ -86,16 +103,68 @@ const FormContainerTwo = ({
   const inputRef12 = useRef(null);
 
   const {
-    sales: salesIsValid,
     location: locationIsInvalid,
     corporate: corporateIsInvalid,
+    sales: salesIsInvalid,
+    corporatename: corporatenameIsValid
   } = credentialsInvalid;
 
+  const {
+    data: dataSearch,
+    mutate,
+    isError: isErrorSearch,
+    error: ErrorSearch,
+    isPending: isPendingSearch,
+    isSuccess: isSuccessSearch,
+  } = useMutation({
+    mutationFn: fetchRecordDataSearch,
+    // the code below will wait the request to finish before moving to another page.
+    onMutate: async (data) => {
+      return data;
+    },
+
+    onSuccess: (data) => {
+      const parsedData = JSON.parse(data);
+      if (parsedData.response === "fail") {
+        Toast.show({
+          type: "error",
+          text1: "Failed to submit",
+          text2: "Failed to submit the record, please try again!",
+        });
+      }
+
+      if (parsedData.response === "success") {
+        const fetchedData = parsedData.corporates.map((item) => item.name)
+        setFilteredData(fetchedData)
+      }
+    },
+  });
+
+  const handleSearch = (text) => {
+    const textFormatted = text.trim();
+
+    if (textFormatted.length === 0) {
+      setFilteredData([]); // Clear search results immediately
+      setQuery("");
+      return; // Prevent mutation from being called
+    }
+
+    // Add a small delay before calling the mutation (debouncing effect)
+    setTimeout(() => {
+      mutate(text);
+    }, 100);
+  };
+
+
+
   function updateInputValueHandler(inputType, enteredValue) {
+    if(inputType === "corporate name"){
+      if(!selected){
+        handleSearch(enteredValue);
+      }
+    }
+
     switch (inputType) {
-      case "sales":
-        setEnteredSales(enteredValue);
-        break;
       case "corporate":
         setEnteredCorporate(enteredValue);
         break;
@@ -107,6 +176,9 @@ const FormContainerTwo = ({
         break;
       case "location":
         setEnteredLocation(enteredValue);
+        break;
+      case "sales":
+        setEnteredSales(enteredValue);
         break;
       case "insurance":
         setEnteredFirms(enteredValue);
@@ -135,16 +207,32 @@ const FormContainerTwo = ({
       case "feedback":
         setEnteredFeedback(enteredValue);
         break;
+      case "corporate name":
+        console.log()
+        setEnteredCorporateName(enteredValue);
+        break;
     }
   }
+
+  const handleSelectSearch = (item) => {
+    if(item) {
+      // updateInputValueHandler(this, "corporate name",)
+      setEnteredCorporateName(item)
+      setSelected(item);
+      setQuery(item);
+      setFilteredData([]);
+    }
+  };
 
   // console.log(enteredSales, enteredLocation, enteredCorporate, enteredFirms, enteredPerson, enteredStaff)
 
   function submitHandler() {
+
     onSubmit({
       sales: enteredSales,
       location: enteredLocation,
       corporate: enteredCorporate,
+      corporateName: enteredCorporateName,
       staff: enteredStaff,
       person: enteredPerson,
       insurance: enteredFirms,
@@ -160,21 +248,24 @@ const FormContainerTwo = ({
   }
 
   useEffect(() => {
-   if(isSuccess && !isError && !isSubmiting){
-    setEnteredLocation("");
-    setEnteredFirms("");
-    setEnteredSales("");
-    setEnteredCorporate("");
-    setEnteredStaff("");
-    setEnteredFirms("");
-    setEnteredAppointDate("");
-    setEnteredTimeAppointment("");
-    setEnteredDesignation("");
-    setEnteredDate("");
-    setEnteredNoStaffTalk("");
-    setEnteredCoupons("")
-    setEnteredPerson("")
-   }
+    if (isSuccess && !isError && !isSubmiting) {
+      setEnteredLocation("");
+      setEnteredFirms("");
+      setEnteredCorporate("");
+      setEnteredStaff("");
+      setEnteredFirms("");
+      setEnteredAppointDate("");
+      setEnteredTimeAppointment("");
+      setEnteredDesignation("");
+      setEnteredDate("");
+      setEnteredNoStaffTalk("");
+      setEnteredCoupons("");
+      setEnteredPerson("");
+      setEnteredSales("");
+      setEnteredTime("")
+      setEnteredDate("")
+      setEnteredCorporateName("")
+    }
   }, [isSuccess, isError, isSubmiting]);
 
   return (
@@ -186,41 +277,75 @@ const FormContainerTwo = ({
         <ScrollView
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps='handled'>
-          <DropdownComponent
-            isInvalid={locationIsInvalid}
-            label='Location'
-            data={data.locationData}
-            value={enteredLocation}
-            onUpdateValue={updateInputValueHandler.bind(this, "location")}
-            ref={inputRef3}
-          />
-          <InputTwo
-            label='Sales Representative'
-            onUpdateValue={updateInputValueHandler.bind(this, "sales")}
-            value={enteredSales}
-            isInvalid={salesIsValid}
-            placeholder='Enter name'
-            onSubmitEditing={() => inputRef2.current?.focus()}
-            blurOnSubmit={false}
-            returnKeyType='next'
-          />
+          {isCorporateMap && (
+            <DropdownComponent
+              label='Location'
+              data={data.locationData}
+              value={enteredLocation}
+              onUpdateValue={updateInputValueHandler.bind(this, "location")}
+              ref={inputRef1}
+            />
+          )}
+          {isCorporateMap && (
+            <InputTwo
+              label='Sales Representative'
+              ref={inputRef2}
+              onUpdateValue={updateInputValueHandler.bind(this, "sales")}
+              value={enteredSales}
+              isInvalid={salesIsInvalid}
+              placeholder='Enter  name'
+            />
+          )}
 
-          <InputTwo
-            label='Corporate Name'
-            ref={inputRef2}
-            onUpdateValue={updateInputValueHandler.bind(this, "corporate")}
-            value={enteredCorporate}
-            isInvalid={corporateIsInvalid}
-            placeholder='Enter corporate name'
-          />
+          {isCorporateMap && (
+            <InputTwo
+              label='Corporate Name'
+              ref={inputRef2}
+              onUpdateValue={updateInputValueHandler.bind(this, "corporate")}
+              value={enteredCorporate}
+              isInvalid={corporateIsInvalid}
+              placeholder='Enter corporate name'
+            />
+          )}
 
-          {(isCorporateMap || isOutComeScreen) && (
+          {isCorporateMap && (
+            <DropdownComponent
+              label='Approximate Number of staffs'
+              data={data.staffData}
+              value={enteredStaff}
+              onUpdateValue={updateInputValueHandler.bind(this, "staff")}
+              ref={inputRef3}
+            />
+          )}
+
+          {(isEyeClinicScreen || isMeetingCorp || isOutComeScreen) && (
+            <InputTwo
+              label='Corporate Name'
+              ref={inputRef2}
+              onUpdateValue={updateInputValueHandler.bind(
+                this,
+                "corporate name"
+              )}
+              value={enteredCorporateName}
+              placeholder='Enter corporate name to search'
+                isInvalid={corporatenameIsValid}
+            />
+          )}
+
+          {filteredData.length > 0 && (
+            <SearchComp
+              onChangeSelect={handleSelectSearch}
+              filteredData={filteredData}
+            />
+          )}
+
+          {isCorporateMap && (
             <InputTwo
               label='Insurance  Firms'
               ref={inputRef2}
               onUpdateValue={updateInputValueHandler.bind(this, "insurance")}
               value={enteredFirms}
-              placeholder='Enter corporate name'
+              placeholder='Enter firm name'
             />
           )}
 
@@ -231,6 +356,7 @@ const FormContainerTwo = ({
               onUpdateValue={updateInputValueHandler.bind(this, "person")}
               value={enteredPerson}
               placeholder='Person Contacted'
+              keyboardType='phone-pad'
             />
           )}
 
@@ -317,16 +443,6 @@ const FormContainerTwo = ({
               onUpdateValue={updateInputValueHandler.bind(this, "feedback")}
               value={enteredFeedback}
               placeholder='Enter your answer'
-            />
-          )}
-
-          {(isCorporateMap || isEyeClinicScreen) && (
-            <DropdownComponent
-              label='Approximate Number of staffs'
-              data={data.staffData}
-              value={enteredStaff}
-              onUpdateValue={updateInputValueHandler.bind(this, "staff")}
-              ref={inputRef3}
             />
           )}
 

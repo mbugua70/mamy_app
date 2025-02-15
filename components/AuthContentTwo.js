@@ -27,6 +27,7 @@ function AuthContentTwo({
     sales: false,
     location: false,
     corporate: false,
+    corporatename: false
   });
 
   useEffect(() => {
@@ -35,6 +36,11 @@ function AuthContentTwo({
       setIsInternetReachable(state.isInternetReachable);
     });
 
+    setTimeout(() => {
+     if(unsubscribe()){
+      checkNetwork()
+     }
+    }, 3000)
     return () => unsubscribe();
   }, []);
 
@@ -43,6 +49,7 @@ function AuthContentTwo({
       sales,
       location,
       corporate,
+      corporateName,
       staff,
       person,
       insurance,
@@ -56,36 +63,46 @@ function AuthContentTwo({
       feedback,
     } = credentials;
 
-    sales = sales.trim();
+    sales = sales.trim()
     location = location.trim();
     corporate = corporate.trim();
-    // frequency = frequency.trim();
-    // variant = variant.trim();
-    // sku = sku.trim();
-    // feedback = feedback.trim();
-    // purchase = purchase.trim();
+    corporateName = corporateName.trim()
 
-    const salesIsValid = sales.length > 2;
     const locationIsValid = location.length > 2;
     const corporateIsValid = corporate.length > 1;
-    // const variantIsValid = variant.length > 1;
-    // const skuIsValid = sku.length > 1;
-    // const feedbackIsvalid = feedback.length > 1;
-    // const pricingIsValid = pricing.length > 1;
-    // const purchaseIsValid = purchase.length > 1;
+    const salesIsValid = sales.length > 2
+    const corporatenameIsValid = corporateName.length > 2
 
-    if (
-      !salesIsValid ||
-      !locationIsValid ||
-      !corporateIsValid
-    ) {
-      Alert.alert("Invalid input", "Please check your input values.");
-      setCredentialsInvalid({
-        sales: !salesIsValid,
-        location: !locationIsValid,
-        corporate: !corporateIsValid,
-      });
-      return;
+
+    if(isCorporateMap){
+      if (
+        !salesIsValid ||
+        !locationIsValid ||
+        !corporateIsValid
+      ) {
+        console.log("invalid 1")
+        Alert.alert("Invalid input", "Please check your input values.");
+        setCredentialsInvalid({
+          sales: !salesIsValid,
+          location: !locationIsValid,
+          corporate: !corporateIsValid,
+        });
+        return;
+      }
+    }else if (isEyeClinicScreen || isMeetingCorp || isOutComeScreen){
+      if (
+        !corporatenameIsValid
+      ) {
+        console.log("invalid 2")
+        Alert.alert("Invalid input", "Please check your input values.");
+        setCredentialsInvalid({
+          sales: salesIsValid,
+          location: locationIsValid,
+          corporate: corporateIsValid,
+          corporateName: corporatenameIsValid
+        });
+        return;
+      }
     }
 
     if (isOffline) {
@@ -110,10 +127,31 @@ function AuthContentTwo({
       sales: !salesIsValid,
       corporate: !corporateIsValid,
       location: !locationIsValid,
+      corporateName: !corporatenameIsValid
     });
-    console.log(credentials, "sending data")
+    console.log("called 2")
     onAuthenticate(credentials);
   }
+
+
+  const checkNetwork = () => {
+    if (isOffline) {
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "No internet connection. Please try again later.",
+      });
+      return;
+    } else if (!isInternetReachable) {
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "No internet access",
+      });
+      return;
+    }
+  }
+
 
   return (
     <View style={styles.authContent}>

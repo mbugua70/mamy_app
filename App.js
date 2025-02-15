@@ -199,9 +199,11 @@ function AuthenticatedStack() {
 function Navigation() {
   const authctx = useContext(AuthContext);
   console.log("screen", authctx.isAuthenticate);
+  const isAuth = true
   return (
     <NavigationContainer>
       {authctx.isAuthenticate ? <AuthenticatedStack /> : <AuthStack />}
+      {/* { isAuth ? <AuthenticatedStack /> : <AuthStack />} */}
     </NavigationContainer>
   );
 }

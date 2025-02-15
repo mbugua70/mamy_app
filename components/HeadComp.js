@@ -16,12 +16,11 @@ const styles = StyleSheet.create({
     imageContainer: {
       width: 220,
       height: 50,
-
     },
+
     image: {
         width: "100%",
         height: "100%",
-
     },
 
     heading: {

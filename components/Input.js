@@ -14,7 +14,8 @@ const Input = ({
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <View style={styles.screencontainer}>
+    <>
+      <View style={styles.screencontainer}>
       <TextInput
       style={{borderRadius: 30}}
       mode='outlined'
@@ -32,6 +33,8 @@ const Input = ({
       }}
     />
     </View>
+    </>
+
   )
 }
 

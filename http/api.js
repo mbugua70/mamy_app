@@ -3,11 +3,44 @@ import { QueryClient } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient();
 
+// login fun
+export async function LoginHander({ name, password }) {
+  if (!name || !password) {
+    throw new Error("No username and password provided!");
+  }
+
+  const userData = {
+    username: name,
+    password: password,
+  };
+   const formData = new FormData()
+  // const encodedDat = new URLSearchParams(userData).toString();
+
+  formData.append("username", userData.username)
+  formData.append("password", userData.password)
+
+  const res = await fetch("https://iguru.co.ke/skope_api/login.php", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    return data;
+  } else {
+    throw {
+      message: data || "Submission failed.",
+      statusText: res.statusText,
+      status: res.status,
+    };
+  }
+}
+
+// summary func
 export async function SummaryForm(recordData) {
-  const { sales, location, corporate, staff, person, insurance } = recordData;
-  console.log(sales, location, corporate, staff, person, insurance, "checking");
+  const {sales, location, corporate, staff, person, insurance } = recordData;
   const token = await AsyncStorage.getItem("token");
-  console.log("Token from AsyncStorage:", token);
   if (!token) {
     throw new Error("No token found in AsyncStorage.");
   }
@@ -29,7 +62,7 @@ export async function SummaryForm(recordData) {
   formData.append("ba_phone", PhoneEl);
   formData.append("ba_region", locationsEl);
   formData.append("sub_1_1", location);
-  formData.append("sub_1_2", sales);
+  formData.append("sub_1_2", sales)
   formData.append("sub_1_3", corporate);
   formData.append("sub_1_4", insurance);
   formData.append("sub_1_5", person);
@@ -43,15 +76,12 @@ export async function SummaryForm(recordData) {
   // formData.append("sub_1_13", lat ?? "0");
   // formData.append("sub_1_14", long ?? "0");
 
-  console.log("Submitting data:", Object.fromEntries(formData.entries()));
-
   const res = await fetch("https://iguru.co.ke/skope_api/BM.php", {
     method: "POST",
     body: formData,
   });
 
   const data = await res.text(); // Handle as plain text
-  console.log(data);
   if (res.ok) {
     return data;
   } else {
@@ -63,12 +93,13 @@ export async function SummaryForm(recordData) {
   }
 }
 
+// func summarytwo
 export async function SummaryFormTwo(recordData) {
-  const { sales, location, corporate, appointmentdate, appointmenttime } =
-    recordData;
+  const { corporateName, appointmentdate, appointmenttime } = recordData;
+
+  console.log(corporateName, appointmentdate, appointmenttime )
 
   const token = await AsyncStorage.getItem("token");
-  console.log("Token from AsyncStorage:", token);
   if (!token) {
     throw new Error("No token found in AsyncStorage.");
   }
@@ -89,11 +120,11 @@ export async function SummaryFormTwo(recordData) {
   formData.append("ba_name", nameEl);
   formData.append("ba_phone", PhoneEl);
   formData.append("ba_region", locationsEl);
-  formData.append("sub_1_1", location);
-  formData.append("sub_1_2", sales);
-  formData.append("sub_1_3", corporate);
+  formData.append("sub_1_3", corporateName);
   formData.append("sub_1_4", appointmentdate);
   formData.append("sub_1_5", appointmenttime);
+  // formData.append("sub_1_4", );
+  // formData.append("sub_1_5", );
   // formData.append("sub_1_7", frequency);
   // formData.append("sub_1_8", purchase);
   // formData.append("sub_1_9", variant);
@@ -103,15 +134,12 @@ export async function SummaryFormTwo(recordData) {
   // formData.append("sub_1_13", lat ?? "0");
   // formData.append("sub_1_14", long ?? "0");
 
-  console.log("Submitting data:", Object.fromEntries(formData.entries()));
-
   const res = await fetch("https://iguru.co.ke/skope_api/BM.php", {
     method: "POST",
     body: formData,
   });
 
   const data = await res.text(); // Handle as plain text
-  console.log(data);
   if (res.ok) {
     return data;
   } else {
@@ -122,18 +150,15 @@ export async function SummaryFormTwo(recordData) {
     };
   }
 }
+
 export async function SummaryFormThree(recordData) {
   const {
-    sales,
-    location,
-    corporate,
-    staff,
+    corporateName,
     appointmentdate,
     appointmenttime,
   } = recordData;
 
   const token = await AsyncStorage.getItem("token");
-  console.log("Token from AsyncStorage:", token);
   if (!token) {
     throw new Error("No token found in AsyncStorage.");
   }
@@ -154,10 +179,7 @@ export async function SummaryFormThree(recordData) {
   formData.append("ba_name", nameEl);
   formData.append("ba_phone", PhoneEl);
   formData.append("ba_region", locationsEl);
-  formData.append("sub_1_1", location);
-  formData.append("sub_1_2", sales);
-  formData.append("sub_1_3", corporate);
-  formData.append("sub_1_4", staff);
+  formData.append("sub_1_3", corporateName);
   formData.append("sub_1_5", appointmentdate);
   formData.append("sub_1_6", appointmenttime);
   // formData.append("sub_1_7", frequency);
@@ -169,15 +191,12 @@ export async function SummaryFormThree(recordData) {
   // formData.append("sub_1_13", lat ?? "0");
   // formData.append("sub_1_14", long ?? "0");
 
-  console.log("Submitting data:", Object.fromEntries(formData.entries()));
-
   const res = await fetch("https://iguru.co.ke/skope_api/BM.php", {
     method: "POST",
     body: formData,
   });
 
-  const data = await res.json(); // Handle as plain text
-  console.log(data);
+  const data = await res.text(); // Handle as plain text
   if (res.ok) {
     return data;
   } else {
@@ -191,12 +210,9 @@ export async function SummaryFormThree(recordData) {
 
 export async function SummaryFormFour(recordData) {
   const {
-    sales,
-      location,
-      corporate,
-      person,
-      insurance,
+      corporateName,
       designation,
+      person,
       date,
       time,
       talked,
@@ -205,7 +221,6 @@ export async function SummaryFormFour(recordData) {
   } = recordData;
 
   const token = await AsyncStorage.getItem("token");
-  console.log("Token from AsyncStorage:", token);
   if (!token) {
     throw new Error("No token found in AsyncStorage.");
   }
@@ -226,30 +241,28 @@ export async function SummaryFormFour(recordData) {
   formData.append("ba_name", nameEl);
   formData.append("ba_phone", PhoneEl);
   formData.append("ba_region", locationsEl);
-  formData.append("sub_1_1", location);
-  formData.append("sub_1_2", sales);
-  formData.append("sub_1_3", corporate);
-  formData.append("sub_1_4", insurance);
-  formData.append("sub_1_5", person);
+  formData.append("sub_1_2", corporateName);
+  formData.append("sub_1_5", person)
   formData.append("sub_1_6", designation);
-  formData.append("sub_1_7", data);
+  formData.append("sub_1_7", date);
   formData.append("sub_1_8", time);
   formData.append("sub_1_9", talked);
   formData.append("sub_1_10", coupons);
   formData.append("sub_1_11", feedback);
+  // formData.append("sub_1_9", talked);
+  // formData.append("sub_1_10", coupons);
+  // formData.append("sub_1_11", feedback);
   // formData.append("sub_1_12", feedback);
   // formData.append("sub_1_13", lat ?? "0");
   // formData.append("sub_1_14", long ?? "0");
 
-  console.log("Submitting data:", Object.fromEntries(formData.entries()));
 
   const res = await fetch("https://iguru.co.ke/skope_api/BM.php", {
     method: "POST",
     body: formData,
   });
 
-  const data = await res.json(); // Handle as plain text
-  console.log(data);
+  const data = await res.text(); // Handle as plain text
   if (res.ok) {
     return data;
   } else {
@@ -281,7 +294,6 @@ export async function fetchRecordData(phone) {
       throw new Error("Failed to fetch package data");
     }
     const data = await response.text();
-    console.log("Response text", data);
     return data;
   } catch (error) {
     console.log("Error found");
@@ -290,11 +302,41 @@ export async function fetchRecordData(phone) {
   }
 }
 
-// appointmentdate,
-// appointmenttime,
-// designation,
-// date,
-// time,
-// talked,
-// coupons,
-// feedback,
+
+
+
+/**
+ *
+ *
+ * @export
+ * @param {*} query
+ * @return {data}
+ * query to fetch corporate names
+ */
+export async function fetchRecordDataSearch(query) {
+  const corporateName = {
+    corporate: query,
+  };
+
+  const encodedDat = new URLSearchParams(corporateName).toString();
+
+  try {
+    const response = await fetch(`https://iguru.co.ke/skope_api/corporates.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: encodedDat,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch package data");
+    }
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    console.log("Error found");
+    console.error("Error fetching package data:", error);
+    return error;
+  }
+}

@@ -2,43 +2,48 @@ import { View, Text, TextInput, StyleSheet, Platform } from "react-native";
 import { GlobalStyles } from "../Constants/Globalcolors";
 import { forwardRef } from "react";
 
-const InputTwo = forwardRef((
-  {
-    label,
-    keyboardType,
-    secure,
-    onUpdateValue,
-    value,
-    isInvalid,
-    placeholder,
-    onSubmitEditing,
-    blurOnSubmit,
-    returnKeyType
-  }, ref
-) => {
-  return (
-    <View style={styles.inputContainer}>
-      <Text style={[styles.label, isInvalid && styles.labelInvalid]}>
-        {label}
-      </Text>
-     <TextInput
-        style={[styles.input, isInvalid && styles.inputInvalid]}
-        // autoCapitalize={false}
-        autoCapitalize='none'
-        keyboardType={keyboardType}
-        secureTextEntry={secure}
-        onChangeText={onUpdateValue}
-        value={value}
-        placeholder={placeholder}
-        returnKeyType={returnKeyType}
-        ref={ref}
-        onSubmitEditing={onSubmitEditing}
-        blurOnSubmit={blurOnSubmit}
-      />
+const InputTwo = forwardRef(
+  (
+    {
+      label,
+      keyboardType,
+      secure,
+      onUpdateValue,
+      value,
+      isInvalid,
+      placeholder,
+      onSubmitEditing,
+      blurOnSubmit,
+      returnKeyType,
+    },
+    ref
+  ) => {
 
-    </View>
-  );
-});
+    return (
+      <>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.label, isInvalid && styles.labelInvalid]}>
+            {label}
+          </Text>
+          <TextInput
+            style={[styles.input, isInvalid && styles.inputInvalid]}
+            // autoCapitalize={false}
+            autoCapitalize='none'
+            keyboardType={keyboardType}
+            secureTextEntry={secure}
+            onChangeText={onUpdateValue}
+            value={value}
+            placeholder={placeholder}
+            returnKeyType={returnKeyType}
+            ref={ref}
+            onSubmitEditing={onSubmitEditing}
+            blurOnSubmit={blurOnSubmit}
+          />
+        </View>
+      </>
+    );
+  }
+);
 
 export default InputTwo;
 

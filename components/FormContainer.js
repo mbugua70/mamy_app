@@ -9,16 +9,16 @@ import { GlobalStyles } from '../Constants/Globalcolors';
 
 const FormContainer = ({ onSubmit, credentialsInvalid, isAuthenticate, name, phone, region, isUpdating}) => {
    const [enteredName, setEnteredName] = useState(name ? name : "");
-    const [enteredPhone, setEnteredPhone] = useState(phone ? phone : "");
-    const [enteredRegion, setEnteredRegion] = useState(region ? region : "");
+    const [enteredPassword, setEnteredPassword] = useState("");
+    const [query, setQuery] = useState("");
+    const [selected, setSelected] = useState("");
     const isFocused = useIsFocused()
     const navigation = useNavigation();
 
 
     const {
       name: nameIsValid,
-      phone: phoneIsInvalid,
-      region: regionIsInvalid,
+      password: passwordIsInvalid,
     } = credentialsInvalid;
 
     function  updateInputValueHandler(inputType, enteredValue) {
@@ -26,11 +26,8 @@ const FormContainer = ({ onSubmit, credentialsInvalid, isAuthenticate, name, pho
         case 'name':
           setEnteredName(enteredValue);
           break;
-        case 'phone':
-          setEnteredPhone(enteredValue);
-          break;
-        case 'region':
-          setEnteredRegion(enteredValue);
+        case 'password':
+          setEnteredPassword(enteredValue);
           break;
       }
     }
@@ -38,12 +35,11 @@ const FormContainer = ({ onSubmit, credentialsInvalid, isAuthenticate, name, pho
     function submitHandler() {
       onSubmit({
         name: enteredName,
-        phone: enteredPhone,
-        region: enteredRegion,
+        password: enteredPassword,
       });
 
 
-      if (isUpdating && enteredName !== "" && enteredPhone !== "" &&  enteredRegion !== "") {
+      if (isUpdating && enteredName !== "" && enteredPassword !== "") {
         // navigation.setParams(
         //    { name: enteredName, phone: enteredPhone, region: enteredRegion },
         // );
@@ -88,28 +84,17 @@ const FormContainer = ({ onSubmit, credentialsInvalid, isAuthenticate, name, pho
         />
 
        <Input
-          label="Your Phone Number"
-          onUpdateValue={updateInputValueHandler.bind(this, 'phone')}
-          value={enteredPhone}
-          isInvalid={phoneIsInvalid}
-          icon="phone"
-          keyboardType="numeric"
+          label="Password"
+          onUpdateValue={updateInputValueHandler.bind(this, 'password')}
+          value={enteredPassword}
+          isInvalid={passwordIsInvalid}
+          icon="lock"
         />
-
-
-          <Input
-          label="Region"
-          onUpdateValue={updateInputValueHandler.bind(this, 'region')}
-          value={enteredRegion}
-          isInvalid={regionIsInvalid}
-          icon="map-marker"
-        />
-
 
        {/* button content */}
         <View style={styles.submitContainer}>
          {!isUpdating &&  <FlatButton onPress={submitHandler}>
-            Register
+            Login
          </FlatButton>}
         </View>
     </ScrollView>

@@ -5,37 +5,34 @@ import { useNavigation } from "@react-navigation/native";
 // import { Colors } from '../../constants/styles';
 import FormContainer from "./FormContainer";
 
-function AuthContent({  onAuthenticate, name, phone, region, isAuthenticate, isUpdating }) {
+function AuthContent({  onAuthenticate, name, password, isAuthenticate, isUpdating }) {
   const navigation = useNavigation();
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     name: false,
-    region: false,
-    phone: false,
+    password: false,
   });
 
-  function submitHandler(credentials) {
-    let { name, phone, region } = credentials;
 
-    region = region.trim();
-    phone = phone.trim();
+  function submitHandler(credentials) {
+    let { name, password} = credentials;
+
     name = name.trim();
+    password = password.trim();
 
     const nameIsValid = name.length > 2;
-    const phoneRegex = /^[0-9]{7,15}$/;
-    const phoneIsValid = phoneRegex.test(phone);
-    const regionIsValid = region.length > 2;
+    const passwordIsValid = password.length > 3
 
-    if (!regionIsValid || !phoneIsValid || !nameIsValid) {
+
+    if (!nameIsValid || !passwordIsValid) {
       Alert.alert("Invalid Input", "Please check your credentials.");
       setCredentialsInvalid({
         name: !nameIsValid,
-        region: !regionIsValid,
-        phone: !phoneIsValid,
+        password: !passwordIsValid,
       });
 
       return;
     }
-    onAuthenticate({ name, region, phone });
+    onAuthenticate({ name, password });
   }
 
 
@@ -45,8 +42,7 @@ function AuthContent({  onAuthenticate, name, phone, region, isAuthenticate, isU
         isAuthenticate={isAuthenticate}
         isUpdating={isUpdating}
         name={name}
-        phone={phone}
-        region={region}
+        password={password}
         onSubmit={submitHandler}
         credentialsInvalid={credentialsInvalid}
       />
@@ -61,7 +57,6 @@ const styles = StyleSheet.create({
   authContent: {
     flex: 1,
     marginHorizontal: 16,
-    padding: 16,
     borderRadius: 8,
     // backgroundColor: Colors.primary800,
     // elevation: 2,
