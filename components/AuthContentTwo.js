@@ -59,7 +59,7 @@ function AuthContentTwo({
      }
     }, 3000)
     return () => unsubscribe();
-  }, []);
+  }, [isOffline, isInternetReachable]);
 
   async function submitHandler(credentials) {
     let {
@@ -84,6 +84,7 @@ function AuthContentTwo({
     location = location.trim();
     corporate = corporate.trim();
     corporateName = corporateName.trim()
+
 
     const locationIsValid = location.length > 2;
     const corporateIsValid = corporate.length > 1;
@@ -110,13 +111,13 @@ function AuthContentTwo({
       if (
         !corporatenameIsValid
       ) {
-        console.log("invalid 2")
+
         Alert.alert("Invalid input", "Please check your input values.");
         setCredentialsInvalid({
           sales: salesIsValid,
           location: locationIsValid,
           corporate: corporateIsValid,
-          corporateName: corporatenameIsValid
+          corporateName: !corporatenameIsValid
         });
         return;
       }
@@ -146,7 +147,7 @@ function AuthContentTwo({
       location: !locationIsValid,
       corporateName: !corporatenameIsValid
     });
-    console.log("called 2")
+
     onAuthenticate(credentials);
   }
 

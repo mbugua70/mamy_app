@@ -9,12 +9,14 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { ActivityIndicator, MD2Colors } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { fetchRecordDataSearch } from "../http/api";
 
+import Toast from "react-native-toast-message";
 import InputTwo from "./InputTwo";
 import FlatButton from "../UI/FlatButton";
 import DropdownComponent from "./Dropdown";
@@ -46,6 +48,42 @@ const data = {
   ],
 };
 
+/**
+ *
+ *
+ * @param {*} {
+ *   isSuccess,
+ *   isError,
+ *   isLogin,
+ *   onSubmit,
+ *   credentialsInvalid,
+ *   isSubmiting,
+ *   resetForm,
+ *   isMeetingCorp,
+ *   isCorporateMap,
+ *   isEyeClinicScreen,
+ *   isOutComeScreen,
+ * }
+ * @return {*}
+ */
+/**
+ *
+ *
+ * @param {*} {
+ *   isSuccess,
+ *   isError,
+ *   isLogin,
+ *   onSubmit,
+ *   credentialsInvalid,
+ *   isSubmiting,
+ *   resetForm,
+ *   isMeetingCorp,
+ *   isCorporateMap,
+ *   isEyeClinicScreen,
+ *   isOutComeScreen,
+ * }
+ * @return {*}
+ */
 const FormContainerTwo = ({
   isSuccess,
   isError,
@@ -82,6 +120,8 @@ const FormContainerTwo = ({
   const [enteredCoupons, setEnteredCoupons] = useState("");
   const [enteredFeedback, setEnteredFeedback] = useState("");
   const [enteredCorporateName, setEnteredCorporateName] = useState("");
+  const [isOffline, setIsOffline] = useState(false);
+  const [isInternetReachable, setIsInternetReachable] = useState(false);
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [selected, setSelected] = useState("");
@@ -106,8 +146,10 @@ const FormContainerTwo = ({
     location: locationIsInvalid,
     corporate: corporateIsInvalid,
     sales: salesIsInvalid,
-    corporatename: corporatenameIsValid
+    corporateName: corporatenameIsValid
   } = credentialsInvalid;
+
+  // mutation
 
   const {
     data: dataSearch,
@@ -124,24 +166,65 @@ const FormContainerTwo = ({
     },
 
     onSuccess: (data) => {
-      const parsedData = JSON.parse(data);
+
+      const parsedData = JSON.parse(data)
+
       if (parsedData.response === "fail") {
         Toast.show({
           type: "error",
-          text1: "Failed to submit",
-          text2: "Failed to submit the record, please try again!",
+          text1: "Failed to search",
+          text2: "Failed to search the corporate name, Please try again!",
         });
       }
 
       if (parsedData.response === "success") {
-        const fetchedData = parsedData.corporates.map((item) => item.name)
-        setFilteredData(fetchedData)
+        if(parsedData.message === "Data Found"){
+          const fetchedData = parsedData.corporates.map((item) => item.name)
+          setFilteredData(fetchedData)
+        }
+
+        if(parsedData.message === "No Data Found"){
+          setFilteredData([])
+        }
       }
     },
   });
 
+  // offline and internet configuration
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOffline(!state.isConnected);
+      setIsInternetReachable(state.isInternetReachable);
+    });
+
+    setTimeout(() => {
+     if(unsubscribe()){
+      checkNetwork()
+     }
+    }, 3000)
+    return () => unsubscribe();
+  }, []);
+
   const handleSearch = (text) => {
     const textFormatted = text.trim();
+
+    if (isOffline) {
+
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "No internet connection. Please try again later.",
+      });
+      return;
+    } else if (!isInternetReachable) {
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "No internet access",
+      });
+      return;
+    }
 
     if (textFormatted.length === 0) {
       setFilteredData([]); // Clear search results immediately
@@ -156,6 +239,7 @@ const FormContainerTwo = ({
   };
 
 
+  // onchange func handler
 
   function updateInputValueHandler(inputType, enteredValue) {
     if(inputType === "corporate name"){
@@ -214,8 +298,11 @@ const FormContainerTwo = ({
     }
   }
 
+  // select on search handler
+
   const handleSelectSearch = (item) => {
     if(item) {
+
       // updateInputValueHandler(this, "corporate name",)
       setEnteredCorporateName(item)
       setSelected(item);
@@ -224,7 +311,7 @@ const FormContainerTwo = ({
     }
   };
 
-  // console.log(enteredSales, enteredLocation, enteredCorporate, enteredFirms, enteredPerson, enteredStaff)
+// submit to db
 
   function submitHandler() {
 
@@ -247,6 +334,7 @@ const FormContainerTwo = ({
     });
   }
 
+  // clearing the inputs fields
   useEffect(() => {
     if (isSuccess && !isError && !isSubmiting) {
       setEnteredLocation("");
@@ -267,6 +355,26 @@ const FormContainerTwo = ({
       setEnteredCorporateName("")
     }
   }, [isSuccess, isError, isSubmiting]);
+
+  // error when fetching
+
+    useEffect(() => {
+      if (ErrorSearch && !isPendingSearch) {
+        Toast.show({
+          type: "error",
+          text1: "Failed to search",
+          text2: ErrorSearch.message,
+        });
+      } else if (ErrorSearch === "TOO_MANY_ATTEMPTS_TRY-LATER" && !isPending) {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Too many attempts try later",
+        });
+      }
+    }, [ErrorSearch, isPendingSearch]);
+
+
 
   return (
     <KeyboardAvoidingView
