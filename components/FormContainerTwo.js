@@ -314,6 +314,42 @@ const FormContainerTwo = ({
 // submit to db
 
   function submitHandler() {
+     let syntaxDateOne =  enteredAppointDate.replace(/\//g, "-");
+     let syntaxDateTwo = enteredDate.replace(/\//g, "-");
+    // date and time validation
+    let dateFormattedOne = new Date(syntaxDateOne)
+    let dateFormattedTwo = new Date(syntaxDateTwo)
+
+    if(enteredAppointDate !== ""){
+      if(isNaN(dateFormattedOne.getDate())){
+         Toast.show({
+          type: "error",
+          text1: "Wrong Date  format",
+          text2: " Invalid date input",
+         })
+         return;
+       }else{
+
+          dateFormattedOne =  dateFormattedOne.toISOString().split("T")["0"]
+       }
+    }
+
+
+    if(enteredDate !== ""){
+      if(isNaN(dateFormattedTwo.getDate())){
+        Toast.show({
+         type: "error",
+         text1: "Wrong Date  format",
+         text2: " Invalid date input",
+        })
+        return;
+      }else{
+
+         dateFormattedTwo =  dateFormattedTwo.toISOString().split("T")["0"]
+
+      }
+
+    }
 
     onSubmit({
       sales: enteredSales,
@@ -323,15 +359,17 @@ const FormContainerTwo = ({
       staff: enteredStaff,
       person: enteredPerson,
       insurance: enteredFirms,
-      appointmentdate: enteredAppointDate,
+      appointmentdate: dateFormattedOne,
       appointmenttime: enteredTimeAppointment,
       designation: enteredDesignation,
-      date: enteredDate,
+      date: dateFormattedTwo,
       time: enteredTime,
       talked: enteredNoStaffTalk,
       coupons: enteredCoupons,
       feedback: enteredFeedback,
     });
+
+
   }
 
   // clearing the inputs fields
