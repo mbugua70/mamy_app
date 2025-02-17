@@ -292,7 +292,7 @@ const FormContainerTwo = ({
         setEnteredFeedback(enteredValue);
         break;
       case "corporate name":
-        console.log()
+
         setEnteredCorporateName(enteredValue);
         break;
     }
