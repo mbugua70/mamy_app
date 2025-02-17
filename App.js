@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueryClientProvider } from "@tanstack/react-query";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import * as SplashScreen from "expo-splash-screen";
 import { useContext, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -10,6 +10,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { GlobalStyles } from "./Constants/Globalcolors";
 import { AuthContextProvider } from "./store/store";
 import { AuthContext } from "./store/store";
+import { NotifierWrapper } from "react-native-notifier";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 // screens and components import
 import Login from "./screens/Login";
@@ -25,13 +27,10 @@ import EyeClinics from "./screens/EyeClinics";
 import MeetingsOutcome from "./screens/MeetingsOutcome";
 import { queryClient } from "./http/api";
 
-
-
 const Stack = createNativeStackNavigator();
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
-
 
 function AuthStack() {
   return (
@@ -163,7 +162,6 @@ function AuthenticatedStack() {
         }}
       />
 
-
       <Stack.Screen
         name='Profile'
         component={Profile}
@@ -182,14 +180,13 @@ function AuthenticatedStack() {
         options={{
           presentation: "modal",
           headerTintColor: "#fff",
-          contentStyle: {backgroundColor: "#fff"},
+          contentStyle: { backgroundColor: "#fff" },
           headerStyle: { backgroundColor: "#fff" },
           headerBackButtonDisplayMode: "minimal",
           headerShadowVisible: false,
           headerLeft: ({ headerTintColor }) => {
             return <BackButtonIcon tintColor={headerTintColor} />;
           },
-
         }}
       />
     </Stack.Navigator>
@@ -199,7 +196,7 @@ function AuthenticatedStack() {
 function Navigation() {
   const authctx = useContext(AuthContext);
   console.log("screen", authctx.isAuthenticate);
-  const isAuth = true
+  const isAuth = true;
   return (
     <NavigationContainer>
       {authctx.isAuthenticate ? <AuthenticatedStack /> : <AuthStack />}
@@ -224,34 +221,31 @@ function TokenHolder() {
     fetchingToken();
   }, []);
 
-
-
   if (isAppReady) {
     SplashScreen.hide();
   }
 
-
-  if(!isAppReady){
-    return null
+  if (!isAppReady) {
+    return null;
   }
-
 
   return <Navigation />;
 }
 
 export default function App() {
-
-
-
   return (
     <>
       <StatusBar style='dark' />
       <AuthContextProvider>
-        <QueryClientProvider client={queryClient}>
-        <TokenHolder />
-        </QueryClientProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NotifierWrapper>
+            <QueryClientProvider client={queryClient}>
+              <TokenHolder />
+            </QueryClientProvider>
+          </NotifierWrapper>
+        </GestureHandlerRootView>
       </AuthContextProvider>
-      <Toast/>
+      <Toast />
     </>
   );
 }

@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { Alert, StyleSheet, View, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SummaryForm } from "../http/api";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 // import { Colors } from '../../constants/styles';
 
 import { Toast as ToastTwo } from "react-native-toast-message";
 import Toast from "react-native-toast-message";
 import FormContainerTwo from "./FormContainerTwo";
+import { GlobalStyles } from "../Constants/Globalcolors";
 
 function AuthContentTwo({
   isPending,
@@ -28,7 +30,7 @@ function AuthContentTwo({
     sales: false,
     location: false,
     corporate: false,
-    corporatename: false
+    corporatename: false,
   });
 
   useEffect(() => {
@@ -36,28 +38,40 @@ function AuthContentTwo({
       setIsOffline(!state.isConnected);
       setIsInternetReachable(state.isInternetReachable);
 
-      if(!state.isConnected){
-        Toast.show({
-          type: "error",
-          text1: "Network Error",
-          text2: "No internet connection. Please try again later.",
+      if (!state.isConnected) {
+        Notifier.showNotification({
+          title: "Network Error",
+          description: "No network access, Please check your network!",
+          Component: NotifierComponents.Notification,
+          componentProps: {
+            imageSource: require("../assets/image/no-network.png"),
+            containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+            titleStyle: { color: "#fff" },
+            descriptionStyle: { color: "#fff" },
+          },
         });
       }
 
-      if(!state.isInternetReachable){
-        Toast.show({
-          type: "error",
-          text1: "Network Error",
-          text2: "No internet access",
+      if (!state.isInternetReachable) {
+        Notifier.showNotification({
+          title: "Network Error",
+          description: "No internet access!",
+          Component: NotifierComponents.Notification,
+          componentProps: {
+            imageSource: require("../assets/image/no-network.png"),
+            containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+            titleStyle: { color: "#fff" },
+            descriptionStyle: { color: "#fff" },
+          },
         });
       }
     });
 
     setTimeout(() => {
-     if(unsubscribe()){
-      checkNetwork()
-     }
-    }, 3000)
+      if (unsubscribe()) {
+        checkNetwork();
+      }
+    }, 3000);
     return () => unsubscribe();
   }, [isOffline, isInternetReachable]);
 
@@ -80,25 +94,19 @@ function AuthContentTwo({
       feedback,
     } = credentials;
 
-    sales = sales.trim()
+    sales = sales.trim();
     location = location.trim();
     corporate = corporate.trim();
-    corporateName = corporateName.trim()
-
+    corporateName = corporateName.trim();
 
     const locationIsValid = location.length > 2;
     const corporateIsValid = corporate.length > 1;
-    const salesIsValid = sales.length > 2
-    const corporatenameIsValid = corporateName.length > 2
+    const salesIsValid = sales.length > 2;
+    const corporatenameIsValid = corporateName.length > 2;
 
-
-    if(isCorporateMap){
-      if (
-        !salesIsValid ||
-        !locationIsValid ||
-        !corporateIsValid
-      ) {
-        console.log("invalid 1")
+    if (isCorporateMap) {
+      if (!salesIsValid || !locationIsValid || !corporateIsValid) {
+        console.log("invalid 1");
         Alert.alert("Invalid input", "Please check your input values.");
         setCredentialsInvalid({
           sales: !salesIsValid,
@@ -107,34 +115,43 @@ function AuthContentTwo({
         });
         return;
       }
-    }else if (isEyeClinicScreen || isMeetingCorp || isOutComeScreen){
-      if (
-        !corporatenameIsValid
-      ) {
-
+    } else if (isEyeClinicScreen || isMeetingCorp || isOutComeScreen) {
+      if (!corporatenameIsValid) {
         Alert.alert("Invalid input", "Please check your input values.");
         setCredentialsInvalid({
           sales: salesIsValid,
           location: locationIsValid,
           corporate: corporateIsValid,
-          corporateName: !corporatenameIsValid
+          corporateName: !corporatenameIsValid,
         });
         return;
       }
     }
 
     if (isOffline) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet connection. Please try again later.",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No network access, Please check your network!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-network.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     } else if (!isInternetReachable) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet access",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No internet access!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-network.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     }
@@ -145,39 +162,49 @@ function AuthContentTwo({
       sales: !salesIsValid,
       corporate: !corporateIsValid,
       location: !locationIsValid,
-      corporateName: !corporatenameIsValid
+      corporateName: !corporatenameIsValid,
     });
 
     onAuthenticate(credentials);
   }
 
-
   const checkNetwork = () => {
     if (isOffline) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet connection. Please try again later.",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No network access, Please check your network!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-network.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     } else if (!isInternetReachable) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet access",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No internet access!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-network.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     }
-  }
-
+  };
 
   return (
     <View style={styles.authContent}>
       <FormContainerTwo
         resetForm={resetForm}
-         isSubmiting={isPending}
-         isSuccess={isSuccess}
-         isError={isError}
+        isSubmiting={isPending}
+        isSuccess={isSuccess}
+        isError={isError}
         isLogin={isLogin}
         onSubmit={submitHandler}
         credentialsInvalid={credentialsInvalid}

@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Notifier, NotifierComponents } from "react-native-notifier";
+import { GlobalStyles } from "../Constants/Globalcolors";
 
 // import { Colors } from '../../constants/styles';
+import Toast from "react-native-toast-message";
 import NetInfo from "@react-native-community/netinfo";
 import FormContainer from "./FormContainer";
 
@@ -71,17 +74,29 @@ function AuthContent({
     }
 
     if (isOffline) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet connection. Please try again later.",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No network access, Please check your network!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-network.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     } else if (!isInternetReachable) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet access",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No internet access!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-internet.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     }

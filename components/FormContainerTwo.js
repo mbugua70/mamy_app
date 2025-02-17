@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { fetchRecordDataSearch } from "../http/api";
+import { Notifier, NotifierComponents } from "react-native-notifier";
 
 import Toast from "react-native-toast-message";
 import InputTwo from "./InputTwo";
@@ -22,6 +23,7 @@ import FlatButton from "../UI/FlatButton";
 import DropdownComponent from "./Dropdown";
 import LocationPicker from "./LocationPicker";
 import SearchComp from "./SearchComp";
+import { GlobalStyles } from "../Constants/Globalcolors";
 
 const data = {
   locationData: [
@@ -146,7 +148,7 @@ const FormContainerTwo = ({
     location: locationIsInvalid,
     corporate: corporateIsInvalid,
     sales: salesIsInvalid,
-    corporateName: corporatenameIsValid
+    corporateName: corporatenameIsValid,
   } = credentialsInvalid;
 
   // mutation
@@ -166,8 +168,7 @@ const FormContainerTwo = ({
     },
 
     onSuccess: (data) => {
-
-      const parsedData = JSON.parse(data)
+      const parsedData = JSON.parse(data);
 
       if (parsedData.response === "fail") {
         Toast.show({
@@ -178,13 +179,13 @@ const FormContainerTwo = ({
       }
 
       if (parsedData.response === "success") {
-        if(parsedData.message === "Data Found"){
-          const fetchedData = parsedData.corporates.map((item) => item.name)
-          setFilteredData(fetchedData)
+        if (parsedData.message === "Data Found") {
+          const fetchedData = parsedData.corporates.map((item) => item.name);
+          setFilteredData(fetchedData);
         }
 
-        if(parsedData.message === "No Data Found"){
-          setFilteredData([])
+        if (parsedData.message === "No Data Found") {
+          setFilteredData([]);
         }
       }
     },
@@ -199,10 +200,10 @@ const FormContainerTwo = ({
     });
 
     setTimeout(() => {
-     if(unsubscribe()){
-      checkNetwork()
-     }
-    }, 3000)
+      if (unsubscribe()) {
+        checkNetwork();
+      }
+    }, 3000);
     return () => unsubscribe();
   }, []);
 
@@ -210,18 +211,30 @@ const FormContainerTwo = ({
     const textFormatted = text.trim();
 
     if (isOffline) {
-
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet connection. Please try again later.",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No network access, Please check your network!",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-internet.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
+
       return;
     } else if (!isInternetReachable) {
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "No internet access",
+      Notifier.showNotification({
+        title: "Network Error",
+        description: "No internet access",
+        Component: NotifierComponents.Notification,
+        componentProps: {
+          imageSource: require("../assets/image/no-network.png"),
+          containerStyle: { backgroundColor: GlobalStyles.colors.error500 },
+          titleStyle: { color: "#fff" },
+          descriptionStyle: { color: "#fff" },
+        },
       });
       return;
     }
@@ -238,12 +251,11 @@ const FormContainerTwo = ({
     }, 100);
   };
 
-
   // onchange func handler
 
   function updateInputValueHandler(inputType, enteredValue) {
-    if(inputType === "corporate name"){
-      if(!selected){
+    if (inputType === "corporate name") {
+      if (!selected) {
         handleSearch(enteredValue);
       }
     }
@@ -292,7 +304,6 @@ const FormContainerTwo = ({
         setEnteredFeedback(enteredValue);
         break;
       case "corporate name":
-
         setEnteredCorporateName(enteredValue);
         break;
     }
@@ -301,54 +312,48 @@ const FormContainerTwo = ({
   // select on search handler
 
   const handleSelectSearch = (item) => {
-    if(item) {
-
+    if (item) {
       // updateInputValueHandler(this, "corporate name",)
-      setEnteredCorporateName(item)
+      setEnteredCorporateName(item);
       setSelected(item);
       setQuery(item);
       setFilteredData([]);
     }
   };
 
-// submit to db
+  // submit to db
 
   function submitHandler() {
-     let syntaxDateOne =  enteredAppointDate.replace(/\//g, "-");
-     let syntaxDateTwo = enteredDate.replace(/\//g, "-");
+    let syntaxDateOne = enteredAppointDate.replace(/\//g, "-");
+    let syntaxDateTwo = enteredDate.replace(/\//g, "-");
     // date and time validation
-    let dateFormattedOne = new Date(syntaxDateOne)
-    let dateFormattedTwo = new Date(syntaxDateTwo)
+    let dateFormattedOne = new Date(syntaxDateOne);
+    let dateFormattedTwo = new Date(syntaxDateTwo);
 
-    if(enteredAppointDate !== ""){
-      if(isNaN(dateFormattedOne.getDate())){
-         Toast.show({
+    if (enteredAppointDate !== "") {
+      if (isNaN(dateFormattedOne.getDate())) {
+        Toast.show({
           type: "error",
           text1: "Wrong Date  format",
           text2: " Invalid date input",
-         })
-         return;
-       }else{
-
-          dateFormattedOne =  dateFormattedOne.toISOString().split("T")["0"]
-       }
+        });
+        return;
+      } else {
+        dateFormattedOne = dateFormattedOne.toISOString().split("T")["0"];
+      }
     }
 
-
-    if(enteredDate !== ""){
-      if(isNaN(dateFormattedTwo.getDate())){
+    if (enteredDate !== "") {
+      if (isNaN(dateFormattedTwo.getDate())) {
         Toast.show({
-         type: "error",
-         text1: "Wrong Date  format",
-         text2: " Invalid date input",
-        })
+          type: "error",
+          text1: "Wrong Date  format",
+          text2: " Invalid date input",
+        });
         return;
-      }else{
-
-         dateFormattedTwo =  dateFormattedTwo.toISOString().split("T")["0"]
-
+      } else {
+        dateFormattedTwo = dateFormattedTwo.toISOString().split("T")["0"];
       }
-
     }
 
     onSubmit({
@@ -368,8 +373,6 @@ const FormContainerTwo = ({
       coupons: enteredCoupons,
       feedback: enteredFeedback,
     });
-
-
   }
 
   // clearing the inputs fields
@@ -388,31 +391,29 @@ const FormContainerTwo = ({
       setEnteredCoupons("");
       setEnteredPerson("");
       setEnteredSales("");
-      setEnteredTime("")
-      setEnteredDate("")
-      setEnteredCorporateName("")
+      setEnteredTime("");
+      setEnteredDate("");
+      setEnteredCorporateName("");
     }
   }, [isSuccess, isError, isSubmiting]);
 
   // error when fetching
 
-    useEffect(() => {
-      if (ErrorSearch && !isPendingSearch) {
-        Toast.show({
-          type: "error",
-          text1: "Failed to search",
-          text2: ErrorSearch.message,
-        });
-      } else if (ErrorSearch === "TOO_MANY_ATTEMPTS_TRY-LATER" && !isPending) {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Too many attempts try later",
-        });
-      }
-    }, [ErrorSearch, isPendingSearch]);
-
-
+  useEffect(() => {
+    if (ErrorSearch && !isPendingSearch) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to search",
+        text2: ErrorSearch.message,
+      });
+    } else if (ErrorSearch === "TOO_MANY_ATTEMPTS_TRY-LATER" && !isPending) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Too many attempts try later",
+      });
+    }
+  }, [ErrorSearch, isPendingSearch]);
 
   return (
     <KeyboardAvoidingView
@@ -475,7 +476,7 @@ const FormContainerTwo = ({
               value={enteredCorporateName}
               placeholder='Enter corporate name to search'
               isInvalid={corporatenameIsValid}
-              inputType="search"
+              inputType='search'
             />
           )}
 
@@ -517,7 +518,6 @@ const FormContainerTwo = ({
               )}
               value={enteredAppointDate}
               placeholder='YYYY-MM-DD'
-
             />
           )}
 
